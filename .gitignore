@@ -1,4 +1,3 @@
 .venv
-catboost_info
 install_lib.ipynb
 random_forest_model.pkl
