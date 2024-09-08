@@ -1,27 +1,29 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import numpy as np
+import gzip
 
+# Load the model using gzip compression
+with gzip.open('random_forest_model_compressed.pkl.gz', 'rb') as f:
+    rf = pickle.load(f)
 # Load the preprocessor and Random Forest model from pickle files
-with open('preprocessor.pkl', 'rb') as file:
+with open('PII_model.pickle', 'rb') as file:
     preprocessor = pickle.load(file)
-
-with open('random_forest_model.pkl', 'rb') as file:
-    model = pickle.load(file)
 
 # Streamlit application
 st.title('Visa Approval Prediction')
 
 # Define the input fields
-prevailing_wage = st.text_input('Prevailing Wage')
+prevailing_wage = st.text_input('Prevailing Wage', value='5000')
 continent = st.selectbox('Continent', ["asia", "europe", "north_america", "others"])
 Education_of_employee  = st.selectbox('Education Level ', ["high_school",'bachelors', "masters",'doctorate'])
 region_of_employment =st.selectbox('Region of employment ',['Island', 'Midwest', 'Northeast', 'South', 'West'])
 unit_of_wage = st.selectbox('Unit of Wage', ['hour', 'month',"week","year"])
 has_job_experience = st.selectbox('Has Job Experience', ['Yes', 'No'])
 full_time_position = st.selectbox('Full Time Position', ['Yes', 'No'])
-no_of_employees = st.text_input('Number of Employees')
-company_age = st.text_input('Company Age')
+no_of_employees = st.text_input('Number of Employees', value='100')
+company_age = st.text_input('Company Age', value='25')
 
 def make_yes_no(feature):
     if feature == 'Yes':
@@ -140,22 +142,34 @@ if st.button('Check Visa'):
     or_columns = ['has_job_experience', 'full_time_position']
     transform_columns = ['no_of_employees', 'company_age']
 
-    # Combine all column names into one list
-    all_columns = num_features + or_columns + transform_columns
 
-    # Create a DataFrame for the single data point
-    single_data_point = pd.DataFrame([input_data], columns=all_columns)
-
-    # Transform the data using the preprocessor
-    transformed_data_point = preprocessor.transform(single_data_point)
-
-    # Predict using the loaded model
-    prediction = model.predict(transformed_data_point)
+    # # Predict using the loaded model
+    # prediction = model.predict(transformed_data_point)
 
     # Interpret the prediction (assuming binary classification: 0 = Denied, 1 = Approved)
-    if prediction[0] == 1:
+
+
+    import pandas as pd
+
+    # Define the column names used in your preprocessor (replace with actual names)
+    column_names = ['has_job_experience', 'no_of_employees', 'prevailing_wage', 'full_time_position', "company_age", 'Europe', 'North America', 'Asia']
+
+    # Create new data
+    new_data = np.array([[1, no_of_employees, prevailing_wage,1,company_age, europe, north_america, asia]])
+
+    # Convert the NumPy array to a pandas DataFrame with the correct column names
+    new_data_df = pd.DataFrame(new_data, columns=column_names,dtype="float64")
+
+    # Now pass the DataFrame to the preprocessor
+
+    new_data_preprocessed = preprocessor.transform(new_data_df)
+
+    # You can now make predictions using the preprocessed data
+    new_prediction = rf.predict(new_data_preprocessed)
+
+    if new_prediction[0] == "1":
         result = 'Visa Approved'
     else:
         result = 'Visa Denied'
-    
+
     st.write(f'Result: {result}')
