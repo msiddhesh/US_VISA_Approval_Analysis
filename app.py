@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import gzip
 
+st.set_page_config(layout="wide")
+
 # Load the model using gzip compression
 with gzip.open('random_forest_model_compressed.pkl.gz', 'rb') as f:
     rf = pickle.load(f)
@@ -14,16 +16,27 @@ with open('PII_model.pickle', 'rb') as file:
 # Streamlit application
 st.title('Visa Approval Prediction')
 
-# Define the input fields
-prevailing_wage = st.text_input('Prevailing Wage', value='5000')
-continent = st.selectbox('Continent', ["asia", "europe", "north_america", "others"])
-Education_of_employee  = st.selectbox('Education Level ', ["high_school",'bachelors', "masters",'doctorate'])
-region_of_employment =st.selectbox('Region of employment ',['Island', 'Midwest', 'Northeast', 'South', 'West'])
-unit_of_wage = st.selectbox('Unit of Wage', ['hour', 'month',"week","year"])
-has_job_experience = st.selectbox('Has Job Experience', ['Yes', 'No'])
-full_time_position = st.selectbox('Full Time Position', ['Yes', 'No'])
-no_of_employees = st.text_input('Number of Employees', value='100')
-company_age = st.text_input('Company Age', value='25')
+st.markdown("""
+Welcome to the Visa Approval Prediction App. Please fill out the details below and click 'Check Visa' to see if your visa is likely to be approved.
+""")
+
+# Create columns to arrange inputs in a more compact layout
+col1, col2 = st.columns(2)
+
+# Input fields grouped into categories for better readability
+with col1:
+    prevailing_wage = st.text_input('Prevailing Wage', value='5000')
+    continent = st.selectbox('Continent', ["asia", "europe", "north_america", "others"])
+    Education_of_employee = st.selectbox('Education Level', ["high_school", 'bachelors', "masters", 'doctorate'])
+    region_of_employment = st.selectbox('Region of Employment', ['Island', 'Midwest', 'Northeast', 'South', 'West'])
+    unit_of_wage = st.selectbox('Unit of Wage', ['hour', 'month', "week", "year"])
+
+with col2:
+    has_job_experience = st.selectbox('Has Job Experience', ['Yes', 'No'])
+    full_time_position = st.selectbox('Full Time Position', ['Yes', 'No'])
+    no_of_employees = st.text_input('Number of Employees', value='100')
+    company_age = st.text_input('Company Age', value='25')
+
 
 def make_yes_no(feature):
     if feature == 'Yes':
