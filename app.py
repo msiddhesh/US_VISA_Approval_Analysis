@@ -21,7 +21,7 @@ Welcome to the Visa Approval Prediction App. Please fill out the details below a
 """)
 
 # Create columns to arrange inputs in a more compact layout
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([2,2])
 
 # Input fields grouped into categories for better readability
 with col1:
